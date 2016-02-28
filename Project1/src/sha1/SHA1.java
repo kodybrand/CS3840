@@ -19,27 +19,20 @@ import java.util.Calendar;
 public class SHA1
 {
 
-   public static void main(String[] args) throws Exception
+   public SHA1(String input) throws Exception
    {
       Security.addProvider(new BouncyCastleProvider());
-      byte input[] =
-      {
-         0x30, 0x31, 0x32, 0x33, 0x34
-      };
-      byte b[] = null;
       long sTime, eTime;
 
-      RandomAccessFile raf = new RandomAccessFile("c:/test1.txt", "r");
+      RandomAccessFile raf = new RandomAccessFile(input, "r");
 
       int len = (int) raf.length();
       byte[] buffer = new byte[len];
-      raf.read(buffer);
+
 
       try
       {
          //prepare the input
-         
-         System.out.println(Hex.toHexString(buffer));
          MessageDigest hash
                = MessageDigest.getInstance("SHA-1", "BC");
          hash.update(buffer);
@@ -49,12 +42,9 @@ public class SHA1
          byte[] digest = hash.digest();
          eTime = Calendar.getInstance().getTimeInMillis();
 
-         //show us the result
-         System.out.println("input: "
-               + new String(Hex.encode(buffer)));
-         System.out.println("result: "
+         System.out.println(">> SHA-1 Hash: "
                + new String(Hex.encode(digest)));
-         System.out.println("Hash Time : " + (eTime - sTime) + "ms");
+         System.out.println(">> Hash Time : " + (eTime - sTime) + "ms");
       }
       catch (NoSuchAlgorithmException e)
       {
