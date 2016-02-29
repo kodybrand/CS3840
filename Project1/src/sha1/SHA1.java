@@ -28,8 +28,7 @@ public class SHA1
 
       int len = (int) raf.length();
       byte[] buffer = new byte[len];
-
-
+      
       try
       {
          //prepare the input

@@ -10,7 +10,7 @@ import des.JDES;
 public class Project1
 {
 
-   private static String VI = null;
+   private static String IV = null;
    private static String KEY = null;
    private static String inputFile = null;
    private static String outputFile = null;
@@ -25,19 +25,19 @@ public class Project1
    {
       try
       {
-         VI = args[0];
+         IV = args[0];
          KEY = args[1];
          inputFile = args[2];
          outputFile = args[3];
 
-         System.out.println("--- Program 1 : Encryption / Decryption");
-         System.out.println("> VI : " + VI);
-         System.out.println("> KEY: " + KEY);
-         System.out.println("> Input File : " + inputFile);
-         System.out.println("> Output File : " + outputFile + "\n");
-         //desSection();
-         rsaSection();
-         sha1Section();
+//         System.out.println("--- Program 1 : Encryption / Decryption");
+//         System.out.println("> IV : " + IV);
+//         System.out.println("> KEY: " + KEY);
+//         System.out.println("> Input File : " + inputFile);
+//         System.out.println("> Output File : " + outputFile + "\n");
+         desSection();
+         //rsaSection();
+         //sha1Section();
       }
       catch (Exception e)
       {
@@ -45,18 +45,18 @@ public class Project1
       }
    }
 
-//   private void desSection()
-//   {
-//      System.out.println("-- Starting DES Section");
-//      try
-//      {
-//         JDES des = new JDES(inputFile);
-//      }
-//      catch (Exception e)
-//      {
-//         System.out.println(e.getMessage());
-//      }
-//   }
+   private void desSection()
+   {
+      System.out.println("-- Starting DES Section");
+      try
+      {
+         JDES des = new JDES(IV, KEY, inputFile,outputFile);
+      }
+      catch (Exception e)
+      {
+         System.out.println(e.getMessage());
+      }
+   }
 
    private void rsaSection()
    {

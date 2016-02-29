@@ -36,7 +36,7 @@ public class JRSA
       SecureRandom random = new SecureRandom();
       KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", "BC");
 
-      generator.initialize(l, random);
+      generator.initialize(1024, random);
       KeyPair pair = generator.generateKeyPair();
       Key pubKey = pair.getPublic();
       Key privKey = pair.getPrivate();
@@ -45,14 +45,14 @@ public class JRSA
       sTime = Calendar.getInstance().getTimeInMillis();
       byte[] cipherText = cipher.doFinal(input);
       eTime = Calendar.getInstance().getTimeInMillis();
-      System.out.println(">> Cipher Text: " + new String(Hex.encode(cipherText)));
+      //System.out.println(">> Cipher Text: " + new String(Hex.encode(cipherText)));
       System.out.println(">> Encryption Time : " + (eTime - sTime) + "ms");
 
       cipher.init(Cipher.DECRYPT_MODE, privKey);
       sTime = Calendar.getInstance().getTimeInMillis();
       byte[] plainText = cipher.doFinal(cipherText);
       eTime = Calendar.getInstance().getTimeInMillis();
-      System.out.println(">> plain : " + new String(plainText));
+      //System.out.println(">> plain : " + new String(plainText));
       System.out.println(">> Decryption Time : " + (eTime - sTime) + "ms");
    }
 }

@@ -4,11 +4,12 @@ package des;
 
  @author tianb
  */
+import java.io.RandomAccessFile;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
 import java.util.Calendar;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -16,102 +17,83 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
+import javax.crypto.spec.IvParameterSpec;
 import org.bouncycastle.util.encoders.*;
 
 public class JDES
 {
 
-   public static void main(String[] argv)
+   public JDES(String initVal, String key, String inputFile, String outputFile)
    {
-      String VI= null;
-      String KEY = null;
-      String inputFile = null;
-      String outputFile = null;
-      try
-      {
-         VI = argv[0];
-         KEY = argv[1];
-         inputFile = argv[2];
-         outputFile = argv[3];
-      }
-      catch (Exception e)
-      {
-         System.out.println("Error : " + e.getLocalizedMessage());
-      }
 
       long sTime;
       long eTime;
-
       try
       {
+         RandomAccessFile rafread = new RandomAccessFile(inputFile, "r");
+         RandomAccessFile rafwrite = new RandomAccessFile(outputFile, "rw");
 
          // This generate a DES key based on your key
-         String key = KEY;
          SecretKeyFactory keyfactory = SecretKeyFactory.getInstance("DES");
          DESKeySpec mydeskeyspec = new DESKeySpec(key.getBytes());
          SecretKey myDesKey = keyfactory.generateSecret(mydeskeyspec);
 
-			// This automatically generate a DES key
-         //KeyGenerator keygenerator = KeyGenerator.getInstance("DES");
-         //SecretKey myDesKey = keygenerator.generateKey();
          System.out.println("My Key: " + key);
          System.out.println("DES Key: " + new String(Hex.encode(myDesKey.getEncoded())));
 
          Cipher desCipher;
+         byte data[] = new byte[8];
+         byte enData[] = null;
+         byte deData[] = null;
 
          // Create the cipher 
-         desCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
+         desCipher = Cipher.getInstance("DES/CBC/NoPadding");
 
          // Initialize the cipher for encryption
-         desCipher.init(Cipher.ENCRYPT_MODE, myDesKey);
+         IvParameterSpec iv = new IvParameterSpec(hexStringToByteArray(initVal));
+
+         desCipher.init(Cipher.ENCRYPT_MODE, myDesKey, iv);
 
          //sensitive information
-         byte[] text = "12345678".getBytes();
+         String message = "";
+         byte end [];
+         boolean first = true;
+         while (rafread.read(data) != -1)
+         {
+            // data is set with the 8bits of stuff
+            byte[] ivprms = iv.getIV();
 
-         System.out.println("Text [Hex Format] : " + new String(Hex.encode(text)) + " length = " + text.length);
-         System.out.println("Text : " + new String(text));
+            byte xord[] = new byte[8];
 
-         // Encrypt the text
-         sTime = Calendar.getInstance().getTimeInMillis();
-         byte[] textEncrypted = desCipher.doFinal(text);
-         eTime = Calendar.getInstance().getTimeInMillis();
+            int i = 0;
+            while (i < 8)
+            {
+               if (first == true || enData == null)
+               {
+                  xord[i] = (byte) (ivprms[i] ^ data[i]);
+               }
+               else
+               {
+                  xord[i] = (byte) (enData[i] ^ data[i]);
+               }
+               i++;
+            }
+            first = false;
 
-         System.out.println("Text Encryted : " + new String(Hex.encode(textEncrypted)));
-         System.out.println("Encryption Time : " + (eTime - sTime) + "ms");
+            // Doing Encryption -> enData = IV for next go round
+            enData = desCipher.update(xord);
+            rafwrite.write(enData);
 
-         // Initialize the same cipher for decryption
-         sTime = Calendar.getInstance().getTimeInMillis();
-         desCipher.init(Cipher.DECRYPT_MODE, myDesKey);
-         eTime = Calendar.getInstance().getTimeInMillis();
+            message = message + new String(Hex.encode(enData));
+            System.out.println(new String(Hex.encode(enData)));
+         }
 
-         // Decrypt the text
-         byte[] textDecrypted = desCipher.doFinal(textEncrypted);
-
-         System.out.println("Text Decryted : " + new String(textDecrypted));
-         System.out.println("Decryption Time : " + (eTime - sTime) + "ms");
+         rafwrite.write(desCipher.doFinal());
+         //System.out.println()
+         System.out.println("Message : " + desCipher.doFinal().length);
 
       }
-      catch (NoSuchAlgorithmException e)
-      {
-         e.printStackTrace();
-      }
-      catch (NoSuchPaddingException e)
-      {
-         e.printStackTrace();
-      }
-      catch (InvalidKeyException e)
-      {
-         e.printStackTrace();
-      }
-      catch (IllegalBlockSizeException e)
-      {
-         e.printStackTrace();
-      }
-      catch (BadPaddingException e)
-      {
-         e.printStackTrace();
-      }
-      catch (InvalidKeySpecException e)
+      catch (Exception e)
       {
          e.printStackTrace();
       }
@@ -132,6 +114,11 @@ public class JDES
          data[i / 2] = (byte) ((Character.digit(chars[i], 16) << 4) + Character.digit(chars[i + 1], 16));
       }
       return data;
+   }
+
+   private byte[] hexStringToByteArray(IvParameterSpec iv)
+   {
+      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
    }
 
 }
