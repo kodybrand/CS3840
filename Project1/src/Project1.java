@@ -1,7 +1,8 @@
 
-import sha1.SHA1;
-import rsa.JRSA;
 import des.JDES;
+import des.JavaDES;
+import rsa.JRSA;
+import sha1.SHA1;
 
 /**
 
@@ -50,7 +51,7 @@ public class Project1
       System.out.println("-- Starting DES Section");
       try
       {
-         JDES des = new JDES(IV, KEY, inputFile,outputFile);
+         JavaDES des = new JavaDES(IV, KEY, inputFile,outputFile);
       }
       catch (Exception e)
       {
